@@ -3,14 +3,11 @@ import datetime
 
 ATP_HOST = "https://bsky.social"
 ATP_AUTH_TOKEN = ""
-
-USERNAME = "YOURUSERNAME.bsky.social"
-PASSWORD = "CHANGEME"
 DID = "" # leave blank
 
 
-def login():
-    data = {"identifier": USERNAME, "password": PASSWORD}
+def login(username, password):
+    data = {"identifier": username, "password": password}
     resp = requests.post(
         ATP_HOST + "/xrpc/com.atproto.server.createSession",
         json=data
@@ -27,8 +24,9 @@ def login():
     return resp
 
 
-def post(postcontent):
-    timestamp = datetime.datetime.now(datetime.timezone.utc)
+def post_skoot(postcontent, timestamp=None):
+    if not timestamp:
+        timestamp = datetime.datetime.now(datetime.timezone.utc)
     timestamp = timestamp.isoformat().replace('+00:00', 'Z')
 
     headers = {"Authorization": "Bearer " + ATP_AUTH_TOKEN}
@@ -50,6 +48,24 @@ def post(postcontent):
         headers=headers
     )
 
+    return resp
+
+def delete_skoot(did,rkey):
+    data = {"collection":"app.bsky.feed.post","repo":"did:plc:{}".format(did),"rkey":"{}".format(rkey)}
+    headers = {"Authorization": "Bearer " + ATP_AUTH_TOKEN}
+    resp = requests.post(
+        ATP_HOST + "/xrpc/com.atproto.repo.deleteRecord",
+        json = data,
+        headers=headers
+    )
+    return resp
+
+def get_latest_skoot(accountname):
+    headers = {"Authorization": "Bearer " + ATP_AUTH_TOKEN}
+    resp = requests.get(
+        ATP_HOST + "/xrpc/app.bsky.feed.getAuthorFeed?actor={}&limit=1".format(accountname),
+        headers = headers
+    )
     return resp
 
 
