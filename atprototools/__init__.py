@@ -5,6 +5,10 @@ import os
 ATP_HOST = "https://bsky.social"
 ATP_AUTH_TOKEN = ""
 DID = "" # leave blank
+# TODO prob makes sense to have username here too, and then always assume username + did are populated
+# two use cases: library calls login() (swap to a class later) and cli user uses a shell variable.
+# in either case login() should populate these globals within this file.
+# maybe PASSWORD shouldn't hang around, but you have bigger problems if you're relying on python encapsulation for security.
 
 # TODO annotate all requests.get/post with auth header
 
@@ -23,6 +27,11 @@ def login(username, password):
 
     global DID
     DID = resp.json().get("did")
+
+    # TODO
+    # global USERNAME
+
+    # global PASSWORD
 
     return resp
 
@@ -63,14 +72,6 @@ def delete_skoot(did,rkey):
     )
     return resp
 
-def get_latest_skoot(accountname):
-    headers = {"Authorization": "Bearer " + ATP_AUTH_TOKEN}
-    resp = requests.get(
-        ATP_HOST + "/xrpc/app.bsky.feed.getAuthorFeed?actor={}&limit=1".format(accountname),
-        headers = headers
-    )
-    return resp
-
 def get_car_file(did_of_car_to_fetch=None):
     '''
     Get a .car file contain all skoots.
@@ -89,6 +90,9 @@ def get_car_file(did_of_car_to_fetch=None):
     )
 
     return resp
+
+def get_latest_skoot(accountname):
+    return get_latest_n_skoots(accountname, 1)
 
 def get_latest_n_skoots(username, n=5):
     headers = {"Authorization": "Bearer " + ATP_AUTH_TOKEN}

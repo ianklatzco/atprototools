@@ -20,6 +20,8 @@ PASSWORD = os.environ.get("PASSWORD")
 
 atpt.login(USERNAME, PASSWORD)
 atpt.post_skoot("hello world from atprototools")
+latest_skoots = atpt.get_latest_n_skoots('klatz.co',1).content
+carfile = atpt.get_car_file().content
 ```
 
 PEP8 formatted; use autopep8.
