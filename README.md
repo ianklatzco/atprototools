@@ -24,6 +24,10 @@ atpt.post_skoot("hello world from atprototools")
 
 PEP8 formatted; use autopep8.
 
+### changelog
+
+0.0.7: getRepo (car files) and get_latest_n_skoots
+
 ### Thanks to 
 
 - alice

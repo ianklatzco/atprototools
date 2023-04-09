@@ -1,9 +1,12 @@
 import requests
 import datetime
+import os
 
 ATP_HOST = "https://bsky.social"
 ATP_AUTH_TOKEN = ""
 DID = "" # leave blank
+
+# TODO annotate all requests.get/post with auth header
 
 
 def login(username, password):
@@ -67,6 +70,43 @@ def get_latest_skoot(accountname):
         headers = headers
     )
     return resp
+
+def get_car_file(did_of_car_to_fetch=None):
+    '''
+    Get a .car file contain all skoots.
+    TODO is there a putRepo?
+    TODO save to file
+    '''
+
+    if did_of_car_to_fetch == None:
+        did_of_car_to_fetch = DID
+
+    headers = {"Authorization": "Bearer " + ATP_AUTH_TOKEN}
+
+    resp = requests.get(
+        ATP_HOST + "/xrpc/com.atproto.sync.getRepo?did={}".format(did_of_car_to_fetch),
+        headers = headers
+    )
+
+    return resp
+
+def get_latest_n_skoots(username, n=5):
+    headers = {"Authorization": "Bearer " + ATP_AUTH_TOKEN}
+    resp = requests.get(
+        ATP_HOST + "/xrpc/app.bsky.feed.getAuthorFeed?actor={}&limit={}".format(username, n),
+        headers = headers
+    )
+
+    return resp
+
+if __name__ == "__main__":
+    # This code will only be executed if the script is run directly
+    login(os.environ.get("BSKY_USERNAME"), os.environ.get("BSKY_PASSWORD"))
+    # f = get_latest_n_skoots('klatz.co',1).content
+    # print(f)
+    resp = get_car_file()
+    import pdb; pdb.set_trace()
+
 
 
 # resp = login()
