@@ -33,3 +33,4 @@ PEP8 formatted; use autopep8.
 ### Thanks to 
 
 - alice
+- [sirodoht](https://github.com/sirodoht)
