@@ -26,6 +26,14 @@ carfile = atpt.get_car_file().content
 
 PEP8 formatted; use autopep8.
 
+### Running tests
+
+```
+# clone repo
+cd atprototools
+python -m unittest
+```
+
 ### changelog
 
 - 0.0.8: get_skoot_by_url, reskoot

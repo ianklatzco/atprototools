@@ -1,10 +1,11 @@
 import requests
 import datetime
 import os
+import unittest
 
-ATP_HOST = "https://bsky.social"
-ATP_AUTH_TOKEN = ""
-DID = "" # leave blank
+# ATP_HOST = "https://bsky.social"
+# ATP_AUTH_TOKEN = ""
+# DID = "" # leave blank
 # TODO prob makes sense to have username here too, and then always assume username + did are populated
 # two use cases: library calls login() (swap to a class later) and cli user uses a shell variable.
 # in either case login() should populate these globals within this file.
@@ -13,27 +14,26 @@ DID = "" # leave blank
 # TODO annotate all requests.get/post with auth header
 
 
-def login(username, password):
-    data = {"identifier": username, "password": password}
-    resp = requests.post(
-        ATP_HOST + "/xrpc/com.atproto.server.createSession",
-        json=data
-    )
+class Session():
+    def __init__(self, username, password):
+        self.ATP_HOST = "https://bsky.social"
+        self.ATP_AUTH_TOKEN = ""
+        self.DID = ""
+        self.USERNAME = username
 
-    global ATP_AUTH_TOKEN
-    ATP_AUTH_TOKEN = resp.json().get('accessJwt')
-    if ATP_AUTH_TOKEN == None:
-        raise ValueError("No access token, is your password wrong?")
+        data = {"identifier": username, "password": password}
+        resp = requests.post(
+            self.ATP_HOST + "/xrpc/com.atproto.server.createSession",
+            json=data
+        )
 
-    global DID
-    DID = resp.json().get("did")
+        self.ATP_AUTH_TOKEN = resp.json().get('accessJwt')
+        if self.ATP_AUTH_TOKEN == None:
+            raise ValueError("No access token, is your password wrong?")
 
-    # TODO
-    # global USERNAME
+        self.DID = resp.json().get("did")
 
-    # global PASSWORD
-
-    return resp
+        # TODO DIDs expire shortly and need to be refreshed for any long-lived sessions
 
 def post_skoot(postcontent, timestamp=None):
     if not timestamp:
@@ -189,10 +189,11 @@ def get_latest_n_skoots(username, n=5):
 
 if __name__ == "__main__":
     # This code will only be executed if the script is run directly
-    login(os.environ.get("BSKY_USERNAME"), os.environ.get("BSKY_PASSWORD"))
+    # login(os.environ.get("BSKY_USERNAME"), os.environ.get("BSKY_PASSWORD"))
+    sess = Session(os.environ.get("BSKY_USERNAME"), os.environ.get("BSKY_PASSWORD"))
     # f = get_latest_n_skoots('klatz.co',1).content
     # print(f)
-    resp = reskoot("https://staging.bsky.app/profile/naia.bsky.social/post/3jszsrnruws27")
+    # resp = reskoot("https://staging.bsky.app/profile/klatz.co/post/3jt22a3jx5l2a")
     # resp = get_car_file()
     import pdb; pdb.set_trace()
 
