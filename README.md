@@ -28,7 +28,8 @@ PEP8 formatted; use autopep8.
 
 ### changelog
 
-0.0.7: getRepo (car files) and get_latest_n_skoots
+- 0.0.8: get_skoot_by_url, reskoot
+- 0.0.7: getRepo (car files) and get_latest_n_skoots
 
 ### Thanks to 
 

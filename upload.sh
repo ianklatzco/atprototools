@@ -1,1 +1,1 @@
-python setup.py sdist && ~/.local/bin/twine upload dist/atprototools-0.0.7.tar.gz
+python setup.py sdist && ~/.local/bin/twine upload dist/atprototools-0.0.8.tar.gz
