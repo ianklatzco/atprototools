@@ -7,8 +7,8 @@ Usage:
 
 ```bash
 pip install atprototools
-export BSKY_USERAME="yourname.bsky.social"
-export PASSWORD="yourpassword"
+export BSKY_USERNAME="yourname.bsky.social"
+export BSKY_PASSWORD="yourpassword"
 ```
 
 ```python
