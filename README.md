@@ -36,6 +36,7 @@ python -m unittest
 
 ### changelog
 
+- 0.0.10: follow, getProfile
 - 0.0.9: move everything into a session class
 - 0.0.8: get_skoot_by_url, reskoot
 - 0.0.7: getRepo (car files) and get_latest_n_skoots

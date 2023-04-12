@@ -183,10 +183,57 @@ class Session():
 
         return resp
 
-    def follow(self, username):
-        # TODO
-        # POST /createRecord {"collection":"app.bsky.graph.follow","repo":"did:plc:o2hywbrivbyxugiukoexum57","record":{"subject":"did:plc:e4a32z23pazq5dxnucj6wpee","createdAt":"2023-04-12T09:35:50.481Z","$type":"app.bsky.graph.follow"}}
-        pass
+    # [[API Design]] TODO one implementation should be highly ergonomic (comfy 2 use) and the other should just closely mirror the API's exact behavior?
+    # idk if im super happy about returning requests, either, i kinda want tuples where the primary object u get back is whatever ergonomic thing you expect
+    # and then you can dive into that and ask for the request. probably this means writing a class to encapsulate each of the
+    # API actions, populating the class in the implementations, and making the top-level api as pretty as possible
+    # ideally atproto lib contains meaty close-to-the-api and atprototools is a layer on top that focuses on ergonomics?
+    def follow(self, username=None, did_of_person_you_wanna_follow=None):
+
+        if username:
+            did_of_person_you_wanna_follow = self.resolveHandle(username).json().get("did")
+
+        if not did_of_person_you_wanna_follow:
+            # TODO better error in resolveHandle
+            raise ValueError("Failed; please pass a username or did of the person you want to follow (maybe the account doesn't exist?)")
+
+        timestamp = datetime.datetime.now(datetime.timezone.utc)
+        timestamp = timestamp.isoformat().replace('+00:00', 'Z')
+
+        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
+
+        data = {
+            "collection": "app.bsky.graph.follow",
+            "repo": "{}".format(self.DID),
+            "record": {
+                "subject": did_of_person_you_wanna_follow,
+                "createdAt": timestamp,
+                "$type": "app.bsky.graph.follow"
+            }
+        }
+
+        resp = requests.post(
+            self.ATP_HOST + "/xrpc/com.atproto.repo.createRecord",
+            json=data,
+            headers=headers
+        )
+
+        return resp
+    
+    def unfollow(self):
+        # TODO lots of code re-use. package everything into a API_ACTION class.
+        raise NotImplementedError
+    
+    def getProfile(self, did):
+        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
+
+        resp = requests.get(
+            self.ATP_HOST + "/xrpc/app.bsky.actor.getProfile?actor={}".format(did),
+            headers=headers
+        )
+
+        return resp
+
 
 if __name__ == "__main__":
     # This code will only be executed if the script is run directly
