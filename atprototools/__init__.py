@@ -183,6 +183,11 @@ class Session():
 
         return resp
 
+    def follow(self, username):
+        # TODO
+        # POST /createRecord {"collection":"app.bsky.graph.follow","repo":"did:plc:o2hywbrivbyxugiukoexum57","record":{"subject":"did:plc:e4a32z23pazq5dxnucj6wpee","createdAt":"2023-04-12T09:35:50.481Z","$type":"app.bsky.graph.follow"}}
+        pass
+
 if __name__ == "__main__":
     # This code will only be executed if the script is run directly
     # login(os.environ.get("BSKY_USERNAME"), os.environ.get("BSKY_PASSWORD"))
