@@ -1,6 +1,6 @@
 ## atprototools
 
-A couple of functions for making/deleting posts, packaged so you can `pip
+easy-to-use and ergonomic library for interacting with bluesky, packaged so you can `pip
 install` and go.
 
 Usage:
