@@ -16,7 +16,7 @@ from atprototools import Session
 import os
 
 USERNAME = os.environ.get("BSKY_USERNAME")
-PASSWORD = os.environ.get("PASSWORD")
+PASSWORD = os.environ.get("BSKY_PASSWORD")
 
 session = Session(USERNAME, PASSWORD)
 session.post_skoot("hello world from atprototools")
