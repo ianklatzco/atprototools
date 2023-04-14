@@ -2,6 +2,7 @@ import requests
 import datetime
 import os
 import unittest
+import re
 
 # ATP_HOST = "https://bsky.social"
 # ATP_AUTH_TOKEN = ""
@@ -124,10 +125,10 @@ class Session():
                 self.ATP_HOST + "/xrpc/com.atproto.repo.uploadBlob",
                 data=image_bytes,
                 headers=headers
-            )
+                )
         return resp
 
-    def post_skoot(self, postcontent, image_path = None, mention: None, timestamp=None ):
+    def post_skoot(self, postcontent, image_path = None, timestamp=None ):
         if not timestamp:
             timestamp = datetime.datetime.now(datetime.timezone.utc)
         timestamp = timestamp.isoformat().replace('+00:00', 'Z')
@@ -145,18 +146,37 @@ class Session():
             }
         }
 
+        literals = [literal for literal in postcontent.split(' ') if literal.startswith('@')]
+        index = {}
+        for match in re.finditer(literals[0], postcontent):
+            index["byteStart"] = match.start()
+            index["byteEnd"] = match.end()
+
+        handleResponse = self.resolveHandle(literals[0][1:])
+        features = []
+        try:
+            feature = {}
+            feature['did'] = handleResponse.json().get('did')
+            feature['$type'] = 'app.bsky.richtext.facet#mention'
+            features.append(feature)
+        except:
+            pass
+
+        facets = [{'$type': "app.bsky.richtext.facet", "index": index, "features": features}]
+        print(facets)
+        data['record']['facets'] = facets
+
+
         if image_path:
             data['record']['embed'] = {}
+            image_resp = self.uploadBlob(image_path, "image/jpeg")
+            x = image_resp.json().get('blob')
             image_resp = self.uploadBlob(image_path, "image/jpeg")
             data["record"]["embed"]["$type"] = "app.bsky.embed.images"
             data['record']["embed"]['images'] = [{
                 "alt": "",
                 "image": image_resp.json().get('blob')
             }]
-        
-        if mention:
-            data['record']['facets'] = [{}]
-            #TODO: fill this up to add support for mentions using resolveHandle
 
         print(data)
         resp = requests.post(
