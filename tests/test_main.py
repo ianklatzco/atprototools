@@ -40,7 +40,7 @@ class TestSessionLogin(unittest.TestCase):
     def test_post_skoot(self):
         session = Session(BSKY_USERNAME, BSKY_PASSWORD)
         self.assertIsNotNone(session.DID)
-        resp = session.post_skoot("good meme", "tests/test.jpeg")
+        resp = session.post_skoot(" hello @typeofemale.ingroup.social ", "tests/test.jpeg")
         self.assertEqual(resp.status_code, 200)
         # print(resp.json())
         pass
