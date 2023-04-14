@@ -1,7 +1,7 @@
 ## atprototools
 
 easy-to-use and ergonomic library for interacting with bluesky, packaged so you can `pip
-install` and go.
+install atprototools` and go.
 
 Usage:
 
