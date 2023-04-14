@@ -149,16 +149,11 @@ class Session():
         if image:
             image_resp = self.uploadBlob(image, "image/jpeg")
             x = image_resp.json().get('blob')
-            print(x)
+            image_resp = self.uploadBlob(image, "image/jpeg")
             data["record"]["embed"]["$type"] = "app.bsky.embed.images"
             data['record']["embed"]['images'] = [{
                 "alt": "",
-                "image": {
-                    "$type": x.get('$type'),
-                    "mimeType": x.get('mimeType'),
-                    "ref": x.get('ref'),
-                    "size": x.get('size')
-                }
+                "image": image_resp.json().get('blob')
             }]
 
         print(data)
