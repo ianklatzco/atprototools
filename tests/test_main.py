@@ -29,3 +29,18 @@ class TestSessionLogin(unittest.TestCase):
         # TODO figure out this test library's persistent object and re-use the same session for all the tests
         # TODOTODO refresh the token since lifetime is probably a minute
         pass
+
+    def test_uploadBlob(self):
+        session = Session(BSKY_USERNAME, BSKY_PASSWORD)
+        self.assertIsNotNone(session.DID)
+        resp = session.uploadBlob("tests/test.jpeg", "image/jpeg")
+        self.assertEqual(resp.status_code, 200)
+        pass
+
+    def test_post_skoot(self):
+        session = Session(BSKY_USERNAME, BSKY_PASSWORD)
+        self.assertIsNotNone(session.DID)
+        resp = session.post_skoot("good meme", "tests/test.jpeg")
+        self.assertEqual(resp.status_code, 200)
+        # print(resp.json())
+        pass
