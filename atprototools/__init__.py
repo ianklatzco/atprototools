@@ -127,7 +127,7 @@ class Session():
             )
         return resp
 
-    def post_skoot(self, postcontent, image_path = None, timestamp=None ):
+    def post_skoot(self, postcontent, image_path = None, mention: None, timestamp=None ):
         if not timestamp:
             timestamp = datetime.datetime.now(datetime.timezone.utc)
         timestamp = timestamp.isoformat().replace('+00:00', 'Z')
@@ -148,13 +148,15 @@ class Session():
         if image_path:
             data['record']['embed'] = {}
             image_resp = self.uploadBlob(image_path, "image/jpeg")
-            x = image_resp.json().get('blob')
-            image_resp = self.uploadBlob(image_path, "image/jpeg")
             data["record"]["embed"]["$type"] = "app.bsky.embed.images"
             data['record']["embed"]['images'] = [{
                 "alt": "",
                 "image": image_resp.json().get('blob')
             }]
+        
+        if mention:
+            data['record']['facets'] = [{}]
+            #TODO: fill this up to add support for mentions using resolveHandle
 
         print(data)
         resp = requests.post(
