@@ -2,8 +2,8 @@ from setuptools import setup, find_packages
 
 setup(
     name='atprototools',
-    version='0.0.10',
-    description='tools for posting / deleting things from bsky, in python',
+    version='0.0.11',
+    description='Easy-to-use and ergonomic library for interacting with bluesky, packaged so you can `pip install atprototools` and go.',
     author='Ian Klatzco',
     author_email='iklatzco@gmail.com',
     url='https://github.com/ianklatzco/atprototools',

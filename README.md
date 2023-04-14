@@ -1,6 +1,6 @@
 ## atprototools
 
-easy-to-use and ergonomic library for interacting with bluesky, packaged so you can `pip
+Easy-to-use and ergonomic library for interacting with bluesky, packaged so you can `pip
 install atprototools` and go.
 
 Usage:
@@ -20,6 +20,7 @@ PASSWORD = os.environ.get("BSKY_PASSWORD")
 
 session = Session(USERNAME, PASSWORD)
 session.post_skoot("hello world from atprototools")
+# session.post_skoot("here's an image!", "path/to/your/image")
 latest_skoots = session.get_latest_n_skoots('klatz.co',1).content
 carfile = session.get_car_file().content
 ```
@@ -36,6 +37,7 @@ python -m unittest
 
 ### changelog
 
+- 0.0.11: images! in post_skoot.
 - 0.0.10: follow, getProfile
 - 0.0.9: move everything into a session class
 - 0.0.8: get_skoot_by_url, reskoot
