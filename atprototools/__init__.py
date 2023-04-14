@@ -115,8 +115,19 @@ class Session():
         )
 
         return resp
+    
+    def uploadBlob(self, blob_path, content_type):
+        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN, "Content-Type": content_type}
+        with open(blob_path, 'rb') as f:
+            files = {'file': f}
+            resp = requests.post(
+            self.ATP_HOST + "/xrpc/com.atproto.repo.uploadBlob",
+            files=files,
+            headers=headers
+            )
+            return resp
 
-    def post_skoot(self, postcontent, timestamp=None):
+    def post_skoot(self, postcontent, image = None, timestamp=None ):
         if not timestamp:
             timestamp = datetime.datetime.now(datetime.timezone.utc)
         timestamp = timestamp.isoformat().replace('+00:00', 'Z')
@@ -125,15 +136,32 @@ class Session():
 
         data = {
             "collection": "app.bsky.feed.post",
-            "$type": "app.bsky.feed.post",
+            # "$type": "app.bsky.feed.post",
             "repo": "{}".format(self.DID),
             "record": {
                 "$type": "app.bsky.feed.post",
                 "createdAt": timestamp,
                 "text": postcontent,
+                "embed": {}
             }
         }
 
+        if image:
+            image_resp = self.uploadBlob(image, "image/jpeg")
+            x = image_resp.json().get('blob')
+            print(x)
+            data["record"]["embed"]["$type"] = "app.bsky.embed.images"
+            data['record']["embed"]['images'] = [{
+                "alt": "",
+                "image": {
+                    "$type": x.get('$type'),
+                    "mimeType": x.get('mimeType'),
+                    "ref": x.get('ref'),
+                    "size": x.get('size')
+                }
+            }]
+
+        print(data)
         resp = requests.post(
             self.ATP_HOST + "/xrpc/com.atproto.repo.createRecord",
             json=data,
