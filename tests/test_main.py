@@ -1,12 +1,20 @@
 import unittest
 import os
+import random
+import string
 
 from atprototools import *
 
 BSKY_USERNAME = os.environ.get("BSKY_USERNAME")
 BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")
 
+TEST_EMAIL = os.environ.get("TEST_EMAIL")
+INVITE_CODE = os.environ.get("INVITE_CODE")
+
 class TestSessionLogin(unittest.TestCase):
+    def test_registration(self):
+        session = register(''.join(random.choices(string.ascii_lowercase, k=15)), "Password1!", INVITE_CODE, TEST_EMAIL)
+
     def test_login(self):
         session = Session(BSKY_USERNAME, BSKY_PASSWORD)
         self.assertIsNotNone(session.DID)
