@@ -37,7 +37,7 @@ python -m unittest
 
 ### changelog
 
-- 0.0.12: Set your own ATP_HOST! Thanks Shreyan.
+- 0.0.12: Set your own ATP_HOST! get_skyline. Thanks Shreyan.
 - 0.0.11: images! in post_skoot.
 - 0.0.10: follow, getProfile
 - 0.0.9: move everything into a session class
