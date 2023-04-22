@@ -15,8 +15,11 @@ import unittest
 
 
 class Session():
-    def __init__(self, username, password):
-        self.ATP_HOST = "https://bsky.social"
+    def __init__(self, username, password, pds = None):
+        if pds: # check if pds is not empty
+            self.ATP_HOST = pds # use the given value
+        else:
+            self.ATP_HOST = "https://bsky.social" # use bsky.social by default
         self.ATP_AUTH_TOKEN = ""
         self.DID = ""
         self.USERNAME = username
@@ -29,7 +32,7 @@ class Session():
 
         self.ATP_AUTH_TOKEN = resp.json().get('accessJwt')
         if self.ATP_AUTH_TOKEN == None:
-            raise ValueError("No access token, is your password wrong?")
+            raise ValueError("No access token, is your password wrong? Do      export BSKY_PASSWORD='yourpassword'")
 
         self.DID = resp.json().get("did")
 
