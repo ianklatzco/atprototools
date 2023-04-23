@@ -275,6 +275,7 @@ def register(user, password, invcode, email):
     }
 
     resp = requests.post(
+        # don't use self.ATP_HOST here because you can't instantiate a session if you haven't registered an account yet
         "https://bsky.social/xrpc/com.atproto.server.createAccount",
         json = data,
     )
