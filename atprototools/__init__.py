@@ -35,7 +35,6 @@ class Session():
             raise ValueError("No access token, is your password wrong? Do      export BSKY_PASSWORD='yourpassword'")
 
         self.DID = resp.json().get("did")
-
         # TODO DIDs expire shortly and need to be refreshed for any long-lived sessions
 
     def reskoot(self,url):
@@ -166,7 +165,6 @@ class Session():
                 "image": image_resp.json().get('blob')
             }]
 
-        print(data)
         resp = requests.post(
             self.ATP_HOST + "/xrpc/com.atproto.repo.createRecord",
             json=data,
@@ -267,6 +265,22 @@ class Session():
 
         return resp
 
+
+def register(user, password, invcode, email):
+    data = {
+        "email": email,
+        "handle": user + ".bsky.social",
+        "inviteCode": invcode,
+        "password": password,
+    }
+
+    resp = requests.post(
+        # don't use self.ATP_HOST here because you can't instantiate a session if you haven't registered an account yet
+        "https://bsky.social/xrpc/com.atproto.server.createAccount",
+        json = data,
+    )
+
+    return resp
 
 if __name__ == "__main__":
     # This code will only be executed if the script is run directly
