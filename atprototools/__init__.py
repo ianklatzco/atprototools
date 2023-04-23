@@ -15,8 +15,11 @@ import unittest
 
 
 class Session():
-    def __init__(self, username, password):
-        self.ATP_HOST = "https://bsky.social"
+    def __init__(self, username, password, pds = None):
+        if pds: # check if pds is not empty
+            self.ATP_HOST = pds # use the given value
+        else:
+            self.ATP_HOST = "https://bsky.social" # use bsky.social by default
         self.ATP_AUTH_TOKEN = ""
         self.DID = ""
         self.USERNAME = username
@@ -29,7 +32,7 @@ class Session():
 
         self.ATP_AUTH_TOKEN = resp.json().get('accessJwt')
         if self.ATP_AUTH_TOKEN == None:
-            raise ValueError("No access token, is your password wrong?")
+            raise ValueError("No access token, is your password wrong? Do      export BSKY_PASSWORD='yourpassword'")
 
         self.DID = resp.json().get("did")
         # TODO DIDs expire shortly and need to be refreshed for any long-lived sessions
@@ -93,8 +96,15 @@ class Session():
             headers=headers
         )
         return resp
-
-
+    
+    def get_skyline(self,n = 10): # fetches the logged in account's following timeline ("skyline")
+        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
+        resp = requests.get(
+            self.ATP_HOST + "/xrpc/app.bsky.feed.getTimeline?limit={}".format(n),
+            headers=headers
+        )
+        return resp
+    
     def get_skoot_by_url(self,url):
         "https://bsky.social/xrpc/app.bsky.feed.getPostThread?uri=at%3A%2F%2Fdid%3Aplc%3Ascx5mrfxxrqlfzkjcpbt3xfr%2Fapp.bsky.feed.post%2F3jszsrnruws27A"
         "at://did:plc:scx5mrfxxrqlfzkjcpbt3xfr/app.bsky.feed.post/3jszsrnruws27"

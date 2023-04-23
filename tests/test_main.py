@@ -54,3 +54,8 @@ class TestSessionLogin(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         # print(resp.json())
         pass
+
+    def test_get_skyline(self):
+        session = Session(BSKY_USERNAME, BSKY_PASSWORD)
+        skyline_firstitem_text = session.get_skyline(1).json().get('feed')[0].get('post').get('record').get('text')
+        self.assertIsNotNone(skyline_firstitem_text)
