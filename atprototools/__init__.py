@@ -34,7 +34,7 @@ class Session():
         if self.ATP_AUTH_TOKEN == None:
             raise ValueError("No access token, is your password wrong? Do      export BSKY_PASSWORD='yourpassword'")
 
-        self.DID = resp.json().get("did")
+        self.DID = resp.json().get("did").split(":")[-1]
         # TODO DIDs expire shortly and need to be refreshed for any long-lived sessions
 
     def reskoot(self,url):
