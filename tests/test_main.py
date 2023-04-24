@@ -9,10 +9,10 @@ BSKY_USERNAME = os.environ.get("BSKY_USERNAME")
 BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")
 
 class TestSessionLogin(unittest.TestCase):
-	'''
-	This test case uses a random invite code and a generic email and succeeds when registration fails due to
-	an invalid invite code. 
-	'''
+    '''
+    This test case uses a random invite code and a generic email and succeeds when registration fails due to
+    an invalid invite code. 
+    '''
     def test_registration(self):
         resp = register(''.join(random.choices(string.ascii_lowercase, k=15)), "Password1!", "bsky-social-hto7xan", "test@gmail.com")
         self.assertEqual(resp.status_code, 400)
