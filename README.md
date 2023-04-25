@@ -21,7 +21,7 @@ PASSWORD = os.environ.get("BSKY_PASSWORD")
 session = Session(USERNAME, PASSWORD)
 session.post_bloot("hello world from atprototools")
 # session.post_bloot("here's an image!", "path/to/your/image")
-latest_bloot = session.get_latest_n_bloot('klatz.co',1).content
+latest_bloot = session.get_latest_n_bloots('klatz.co',1).content
 carfile = session.get_car_file().content
 ```
 
