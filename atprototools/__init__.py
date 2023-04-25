@@ -37,7 +37,7 @@ class Session():
         self.DID = resp.json().get("did")
         # TODO DIDs expire shortly and need to be refreshed for any long-lived sessions
 
-    def reskoot(self,url):
+    def rebloot(self,url):
         # sample url from desktop
         # POST https://bsky.social/xrpc/com.atproto.repo.createRecord
         # https://staging.bsky.app/profile/klatz.co/post/3jruqqeygrt2d
@@ -56,11 +56,11 @@ class Session():
         }
         '''
 
-        person_youre_reskooting = self.resolveHandle(url.split('/')[-3]).json().get('did') # its a DID
+        person_youre_reblooting = self.resolveHandle(url.split('/')[-3]).json().get('did') # its a DID
         url_identifier = url.split('/')[-1]
 
         # import pdb; pdb.set_trace()
-        skoot_cid = self.get_skoot_by_url(url).json().get('thread').get('post').get('cid')
+        bloot_cid = self.get_bloot_by_url(url).json().get('thread').get('post').get('cid')
 
         # subject -> uri is the maia one (thing rt'ing, scx)
         timestamp = datetime.datetime.now(datetime.timezone.utc)
@@ -73,8 +73,8 @@ class Session():
             "repo": "{}".format(self.DID),
             "record": {
                 "subject": {
-                    "uri":"at://{}/app.bsky.feed.post/{}".format(person_youre_reskooting, url_identifier),
-                    "cid":"{}".format(skoot_cid) # cid of the skoot to reskoot
+                    "uri":"at://{}/app.bsky.feed.post/{}".format(person_youre_reblooting, url_identifier),
+                    "cid":"{}".format(bloot_cid) # cid of the bloot to rebloot
                 },
                 "createdAt": timestamp,
                 "$type": "app.bsky.feed.repost"
@@ -105,7 +105,7 @@ class Session():
         )
         return resp
     
-    def get_skoot_by_url(self,url):
+    def get_bloot_by_url(self,url):
         # https://staging.bsky.app/profile/shinyakato.dev/post/3ju777mfnfv2j
         # TODO s/getPostThread/getPosts
         "https://bsky.social/xrpc/app.bsky.feed.getPostThread?uri=at%3A%2F%2Fdid%3Aplc%3Ascx5mrfxxrqlfzkjcpbt3xfr%2Fapp.bsky.feed.post%2F3jszsrnruws27A"
@@ -138,7 +138,7 @@ class Session():
             )
         return resp
 
-    def post_skoot(self, postcontent, image_path = None, timestamp=None ):
+    def post_bloot(self, postcontent, image_path = None, timestamp=None ):
         if not timestamp:
             timestamp = datetime.datetime.now(datetime.timezone.utc)
         timestamp = timestamp.isoformat().replace('+00:00', 'Z')
@@ -175,7 +175,7 @@ class Session():
 
         return resp
 
-    def delete_skoot(self, did,rkey):
+    def delete_bloot(self, did,rkey):
         data = {"collection":"app.bsky.feed.post","repo":"did:plc:{}".format(did),"rkey":"{}".format(rkey)}
         headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
         resp = requests.post(
@@ -187,7 +187,7 @@ class Session():
 
     def get_car_file(self, did_of_car_to_fetch=None):
         '''
-        Get a .car file contain all skoots.
+        Get a .car file contain all bloots.
         TODO is there a putRepo?
         TODO save to file
         '''
@@ -204,10 +204,10 @@ class Session():
 
         return resp
 
-    def get_latest_skoot(self, accountname):
-        return self.get_latest_n_skoots(accountname, 1)
+    def get_latest_bloot(self, accountname):
+        return self.get_latest_n_bloots(accountname, 1)
 
-    def get_latest_n_skoots(self, username, n=5):
+    def get_latest_n_bloots(self, username, n=5):
         headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
         resp = requests.get(
             self.ATP_HOST + "/xrpc/app.bsky.feed.getAuthorFeed?actor={}&limit={}".format(username, n),
@@ -288,9 +288,9 @@ if __name__ == "__main__":
     # This code will only be executed if the script is run directly
     # login(os.environ.get("BSKY_USERNAME"), os.environ.get("BSKY_PASSWORD"))
     sess = Session(os.environ.get("BSKY_USERNAME"), os.environ.get("BSKY_PASSWORD"))
-    # f = get_latest_n_skoots('klatz.co',1).content
+    # f = get_latest_n_bloots('klatz.co',1).content
     # print(f)
-    # resp = reskoot("https://staging.bsky.app/profile/klatz.co/post/3jt22a3jx5l2a")
+    # resp = rebloot("https://staging.bsky.app/profile/klatz.co/post/3jt22a3jx5l2a")
     # resp = get_car_file()
     import pdb; pdb.set_trace()
 
