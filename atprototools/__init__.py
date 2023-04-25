@@ -2,6 +2,7 @@ import requests
 import datetime
 import os
 import unittest
+import re
 
 # ATP_HOST = "https://bsky.social"
 # ATP_AUTH_TOKEN = ""
@@ -135,7 +136,7 @@ class Session():
                 self.ATP_HOST + "/xrpc/com.atproto.repo.uploadBlob",
                 data=image_bytes,
                 headers=headers
-            )
+                )
         return resp
 
     def post_skoot(self, postcontent, image_path = None, timestamp=None ):
@@ -155,6 +156,27 @@ class Session():
                 "text": postcontent
             }
         }
+
+        literals = [literal for literal in postcontent.split(' ') if literal.startswith('@')]
+        index = {}
+        for match in re.finditer(literals[0], postcontent):
+            index["byteStart"] = match.start()
+            index["byteEnd"] = match.end()
+
+        handleResponse = self.resolveHandle(literals[0][1:])
+        features = []
+        try:
+            feature = {}
+            feature['did'] = handleResponse.json().get('did')
+            feature['$type'] = 'app.bsky.richtext.facet#mention'
+            features.append(feature)
+        except:
+            pass
+
+        facets = [{'$type': "app.bsky.richtext.facet", "index": index, "features": features}]
+        print(facets)
+        data['record']['facets'] = facets
+
 
         if image_path:
             data['record']['embed'] = {}
