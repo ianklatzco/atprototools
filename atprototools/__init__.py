@@ -128,13 +128,12 @@ class Session():
                 )
         return resp
 
-    def post_skoot(self, postcontent, image_path = None, timestamp=None ):
-        if not timestamp:
-            timestamp = datetime.datetime.now(datetime.timezone.utc)
+
+    def post_skoot(self, postcontent, url=None, url_start=0, url_end=1, image_path=None, timestamp=None):
+        timestamp = timestamp or datetime.datetime.now(datetime.timezone.utc)
         timestamp = timestamp.isoformat().replace('+00:00', 'Z')
 
         headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
-
         data = {
             "collection": "app.bsky.feed.post",
             "$type": "app.bsky.feed.post",
@@ -142,50 +141,49 @@ class Session():
             "record": {
                 "$type": "app.bsky.feed.post",
                 "createdAt": timestamp,
-                "text": postcontent
+                "text": postcontent,
+                "facets": []
             }
         }
 
-        literals = [literal for literal in postcontent.split(' ') if literal.startswith('@')]
-        index = {}
-        for match in re.finditer(literals[0], postcontent):
-            index["byteStart"] = match.start()
-            index["byteEnd"] = match.end()
+        literal = next((l for l in postcontent.split(' ') if l.startswith('@')), None)
+        if literal:
+            index = {"byteStart": m.start(), "byteEnd": m.end()} for m in re.finditer(literal, postcontent)
+            try:
+                did = self.resolveHandle(literal[1:]).json().get('did')
+                data["record"]["facets"].append({
+                    "$type": "app.bsky.richtext.facet",
+                    "index": index,
+                    "features": [{"did": did, "$type": "app.bsky.richtext.facet#mention"}]
+                })
+            except:
+                pass
 
-        handleResponse = self.resolveHandle(literals[0][1:])
-        features = []
-        try:
-            feature = {}
-            feature['did'] = handleResponse.json().get('did')
-            feature['$type'] = 'app.bsky.richtext.facet#mention'
-            features.append(feature)
-        except:
-            pass
+        if url:
+            data["record"]["facets"].append({
+                "$type": "app.bsky.richtext.facet",
+                "index": {"byteStart": url_start, "byteEnd": url_end},
+                "features": [{"$type": "app.bsky.richtext.facet#link", "uri": url}]
+            })
 
-        facets = [{'$type': "app.bsky.richtext.facet", "index": index, "features": features}]
-        print(facets)
-        data['record']['facets'] = facets
-
-
-        if image_path:
-            data['record']['embed'] = {}
-            image_resp = self.uploadBlob(image_path, "image/jpeg")
-            x = image_resp.json().get('blob')
-            image_resp = self.uploadBlob(image_path, "image/jpeg")
-            data["record"]["embed"]["$type"] = "app.bsky.embed.images"
-            data['record']["embed"]['images'] = [{
-                "alt": "",
-                "image": image_resp.json().get('blob')
+            data["record"]['embed'] = [{
+                "$type": "app.bsky.embed.external",
+                "external": {"uri": url, "title": "link", "description": "link inserted here"}
             }]
 
-        print(data)
-        resp = requests.post(
+        if image_path:
+            image_resp = self.uploadBlob(image_path, "image/jpeg").json().get('blob')
+            data["record"]["embed"] = {
+                "$type": "app.bsky.embed.images",
+                "images": [{"alt": "", "image": image_resp}]
+            }
+
+        return requests.post(
             self.ATP_HOST + "/xrpc/com.atproto.repo.createRecord",
             json=data,
             headers=headers
         )
 
-        return resp
 
     def delete_skoot(self, did,rkey):
         data = {"collection":"app.bsky.feed.post","repo":"did:plc:{}".format(did),"rkey":"{}".format(rkey)}
