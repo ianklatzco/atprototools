@@ -106,6 +106,8 @@ class Session():
         return resp
     
     def get_skoot_by_url(self,url):
+        # https://staging.bsky.app/profile/shinyakato.dev/post/3ju777mfnfv2j
+        # TODO s/getPostThread/getPosts
         "https://bsky.social/xrpc/app.bsky.feed.getPostThread?uri=at%3A%2F%2Fdid%3Aplc%3Ascx5mrfxxrqlfzkjcpbt3xfr%2Fapp.bsky.feed.post%2F3jszsrnruws27A"
         "at://did:plc:scx5mrfxxrqlfzkjcpbt3xfr/app.bsky.feed.post/3jszsrnruws27"
         "https://staging.bsky.app/profile/naia.bsky.social/post/3jszsrnruws27"
