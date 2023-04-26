@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='atprototools',
-    version='0.0.14',
+    version='0.0.15',
     description='Easy-to-use and ergonomic library for interacting with bluesky, packaged so you can `pip install atprototools` and go.',
     author='Ian Klatzco',
     author_email='iklatzco@gmail.com',

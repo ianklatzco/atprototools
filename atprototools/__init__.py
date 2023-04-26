@@ -107,21 +107,27 @@ class Session():
     
     def get_bloot_by_url(self,url):
         # https://staging.bsky.app/profile/shinyakato.dev/post/3ju777mfnfv2j
-        # TODO s/getPostThread/getPosts
         "https://bsky.social/xrpc/app.bsky.feed.getPostThread?uri=at%3A%2F%2Fdid%3Aplc%3Ascx5mrfxxrqlfzkjcpbt3xfr%2Fapp.bsky.feed.post%2F3jszsrnruws27A"
         "at://did:plc:scx5mrfxxrqlfzkjcpbt3xfr/app.bsky.feed.post/3jszsrnruws27"
         "https://staging.bsky.app/profile/naia.bsky.social/post/3jszsrnruws27"
 
+        # getPosts
+        # https://bsky.social/xrpc/app.bsky.feed.getPosts?uris=at://did:plc:o2hywbrivbyxugiukoexum57/app.bsky.feed.post/3jua5rlgrq42p
+
         headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
 
         username_of_person_in_link = url.split('/')[-3]
-        did_of_person_in_link = self.resolveHandle(username_of_person_in_link).json().get('did')
-        url_identifier = url.split('/')[-1] # the random stuf at the end
+        if not "did:plc" in username_of_person_in_link:
+            did_of_person_in_link = self.resolveHandle(username_of_person_in_link).json().get('did')
+        else:
+            did_of_person_in_link = username_of_person_in_link
+
+        url_identifier = url.split('/')[-1] # the random stuff at the end, better hope there's no query params
 
         uri = "at://{}/app.bsky.feed.post/{}".format(did_of_person_in_link, url_identifier)
 
         resp = requests.get(
-            self.ATP_HOST + "/xrpc/app.bsky.feed.getPostThread?uri={}".format(uri),
+            self.ATP_HOST + "/xrpc/app.bsky.feed.getPosts?uris={}".format(uri),
             headers=headers
         )
 

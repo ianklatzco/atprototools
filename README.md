@@ -37,6 +37,8 @@ python -m unittest
 
 ### changelog
 
+- 0.0.15: get_bloot_by_url switched to getPosts instead of getPostThread
+- 0.0.14: refactoring for cbase talk
 - 0.0.13: register(), thanks Chief!
 - 0.0.12: Set your own ATP_HOST! get_skyline. Thanks Shreyan.
 - 0.0.11: images! in post_bloot.

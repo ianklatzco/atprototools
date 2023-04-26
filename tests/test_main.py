@@ -59,3 +59,14 @@ class TestSessionLogin(unittest.TestCase):
         session = Session(BSKY_USERNAME, BSKY_PASSWORD)
         skyline_firstitem_text = session.get_skyline(1).json().get('feed')[0].get('post').get('record').get('text')
         self.assertIsNotNone(skyline_firstitem_text)
+    
+    def test_get_bloot_by_url(self):
+        session = Session(BSKY_USERNAME, BSKY_PASSWORD)
+
+        url1 = "https://staging.bsky.app/profile/did:plc:o2hywbrivbyxugiukoexum57/post/3jua5rlgrq42p" # did
+        url2 = "https://staging.bsky.app/profile/klatz.co/post/3jua5rlgrq42p" # username
+
+        ee = session.get_bloot_by_url(url1).json()
+        assert ee.get('posts') != None
+        bb = session.get_bloot_by_url(url2).json()
+        assert bb.get('posts') != None
