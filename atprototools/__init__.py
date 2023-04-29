@@ -117,6 +117,27 @@ class Session():
 
         return resp
     
+    
+
+    def get_invites(self):
+        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
+        resp = requests.get(
+            self.ATP_HOST + "/xrpc/com.atproto.server.getAccountInviteCodes",
+            headers=headers
+        )
+
+        invite_codes = [used_by['usedBy'] for code in resp.json()['codes'] for used_by in code['uses']]
+
+        used_by_handles = []
+
+        for code in invite_codes:
+            did_resp_json = requests.get(f'https://plc.directory/{code}').json()
+            handle = did_resp_json['alsoKnownAs'][0].replace("at://", "@")
+            used_by_handles.append(handle)
+
+        return used_by_handles
+
+    
     def uploadBlob(self, blob_path, content_type):
         headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN, "Content-Type": content_type}
         with open(blob_path, 'rb') as f:
@@ -148,7 +169,8 @@ class Session():
 
         literal = next((l for l in postcontent.split(' ') if l.startswith('@')), None)
         if literal:
-            index = {"byteStart": m.start(), "byteEnd": m.end()} for m in re.finditer(literal, postcontent)
+            matches = re.finditer(literal, postcontent)
+            index = [{"byteStart": m.start(), "byteEnd": m.end()} for m in matches]
             try:
                 did = self.resolveHandle(literal[1:]).json().get('did')
                 data["record"]["facets"].append({
