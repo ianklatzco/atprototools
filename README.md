@@ -19,11 +19,27 @@ USERNAME = os.environ.get("BSKY_USERNAME")
 PASSWORD = os.environ.get("BSKY_PASSWORD")
 
 session = Session(USERNAME, PASSWORD)
-session.post_bloot("hello world from atprototools")
-# session.post_bloot("here's an image!", "path/to/your/image")
+
+#Text Post
+rsp = session.post_bloot("hello world from atprototools")
+
+#Post with an Image
+session.post_bloot("here's an image!", "path/to/your/image")
+
+#Get Bloots/Posts
 latest_bloot = session.get_latest_n_bloots('klatz.co',1).content
+
 carfile = session.get_car_file().content
+
+#Reply to a Post
+#Get first post details for replying to, you can also reply to other posts from getting bloots other ways
+#Using bloot from the first text post example
+first_post = rsp.json()
+#Create reply_ref, root is the highest up original post, parent is the comment you want to reply to directly, if you want to reply to root make both the same details.
+reply_ref = {"root": first_post, "parent": first_post}
+session.post_bloot("this is the reply", reply_to=reply_ref)
 ```
+
 
 PEP8 formatted; use autopep8.
 
