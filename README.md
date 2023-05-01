@@ -11,7 +11,7 @@ pip install atprototools && export BSKY_USERNAME="yourname.bsky.social" && expor
 
 TWO-LINER TO GET STARTED YOUR SECOND TIME
 ```
-python -i -c "import atprototools, os; sess = atprototools.Session(os.environ.get('BSKY_USERNAME'), os.environ.get('BSKY_PASSWORD')); \
+python -i -c "import atprototools, os; sess = atprototools.Session(os.environ.get('BSKY_USERNAME'), os.environ.get('BSKY_PASSWORD')); 
 # now use sess.whatever_you_need
 ```
 
