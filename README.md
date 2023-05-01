@@ -5,14 +5,13 @@ packaged so you can `pip install atprototools` and go.
 
 ONE-LINER TO GET STARTED *INSTANTLY* (ノ ゜Д゜)ノ ︵:
 ```
-pip install atprototools && export BSKY_USERNAME="yourname.bsky.social" && export BSKY_PASSWORD="yourpassword" && \ python -i -c "import atprototools, os; sess = atprototools.Session(os.environ.get('BSKY_USERNAME'), os.environ.get('BSKY_PASSWORD'))"
+pip install atprototools && export BSKY_USERNAME="yourname.bsky.social" && export BSKY_PASSWORD="yourpassword" && \ python -i -c "import atprototools, os; sess = atprototools.Session(os.environ.get('BSKY_USERNAME'), os.environ.get('BSKY_PASSWORD')); sess.post_bloot('hello world from atprototools!')"
 # now use sess.whatever_you_need
 ```
 
 TWO-LINER TO GET STARTED YOUR SECOND TIME
 ```
 python -i -c "import atprototools, os; sess = atprototools.Session(os.environ.get('BSKY_USERNAME'), os.environ.get('BSKY_PASSWORD')); \
-sess.post_bloot('hello world from atprototools!')"
 # now use sess.whatever_you_need
 ```
 
