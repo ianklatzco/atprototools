@@ -37,6 +37,20 @@ class Session():
         self.DID = resp.json().get("did")
         # TODO DIDs expire shortly and need to be refreshed for any long-lived sessions
 
+    def reinit(self):
+        # TODO
+        # if a request failed, use refreshJWT
+        resp = self.getProfile("klatz.co")
+
+        if resp.status_code == 200:
+            # yay!
+            # do nothing lol
+            pass
+        else: # re-init
+            # what is the endpoint
+            pass
+                        
+
     def rebloot(self,url):
         # sample url from desktop
         # POST https://bsky.social/xrpc/com.atproto.repo.createRecord
@@ -263,11 +277,13 @@ class Session():
         # TODO lots of code re-use. package everything into a API_ACTION class.
         raise NotImplementedError
     
-    def getProfile(self, did):
+    def getProfile(self, username):
         headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
 
+        # TODO did / username check, it should just work regardless of which it is
+
         resp = requests.get(
-            self.ATP_HOST + "/xrpc/app.bsky.actor.getProfile?actor={}".format(did),
+            self.ATP_HOST + "/xrpc/app.bsky.actor.getProfile?actor={}".format(username),
             headers=headers
         )
 
