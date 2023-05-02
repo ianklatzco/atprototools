@@ -20,24 +20,30 @@ PASSWORD = os.environ.get("BSKY_PASSWORD")
 
 session = Session(USERNAME, PASSWORD)
 
-#Text Post
-rsp = session.post_bloot("hello world from atprototools")
+# make a text post
+resp = session.post_bloot("hello world from atprototools")
 
-#Post with an Image
-session.post_bloot("here's an image!", "path/to/your/image")
+# post an image
+# session.post_bloot("here's an image!", "path/to/your/image")
 
-#Get Bloots/Posts
+# get bloots/posts
 latest_bloot = session.get_latest_n_bloots('klatz.co',1).content
 
-carfile = session.get_car_file().content
+# get archive
+# carfile = session.get_car_file().content
 
-#Reply to a Post
-#Get first post details for replying to, you can also reply to other posts from getting bloots other ways
-#Using bloot from the first text post example
-first_post = rsp.json()
-#Create reply_ref, root is the highest up original post, parent is the comment you want to reply to directly, if you want to reply to root make both the same details.
+# reply to a post
+#   Get first post details for replying to, you can also reply to other posts
+#   from getting bloots other ways
+# Using "hello world" bloot from above:
+first_post = resp.json()
+# Create reply_ref:
+# - root is the highest up original post
+# - parent is the comment you want to reply to directly
+# if you want to reply to root make both the same
 reply_ref = {"root": first_post, "parent": first_post}
 session.post_bloot("this is the reply", reply_to=reply_ref)
+# TODO write a test for replies
 ```
 
 
@@ -53,6 +59,7 @@ python -m unittest
 
 ### changelog
 
+- 0.0.16: replies! added to post_bloot, thanks to Jxck-S
 - 0.0.15: get_bloot_by_url switched to getPosts instead of getPostThread
 - 0.0.14: refactoring for cbase talk
 - 0.0.13: register(), thanks Chief!
