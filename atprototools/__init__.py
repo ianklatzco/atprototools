@@ -211,6 +211,9 @@ class Session():
         return resp
 
     def delete_bloot(self, did,rkey):
+        # rkey: post slug
+        # i.e. /profile/foo.bsky.social/post/AAAA
+        # rkey is AAAA
         data = {"collection":"app.bsky.feed.post","repo":"did:plc:{}".format(did),"rkey":"{}".format(rkey)}
         headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
         resp = requests.post(
