@@ -158,7 +158,21 @@ class Session():
             )
         return resp
 
-    def post_bloot(self, postcontent, image_path = None, timestamp=None ):
+    def post_bloot(self, postcontent, image_path = None, timestamp=None, reply_to=None):
+        """Post a bloot"""
+        #reply_to expects a dict like the following
+        # {
+        #     #root is the main original post
+        #     "root": {
+        #         "cid": "bafyreig7ox2h5kmcmjukbxfpopy65ggd2ymhbnldcu3fx72ij3c22ods3i", #CID of root post
+        #         "uri": "at://did:plc:nx3kofpg4oxmkonqr6su5lw4/app.bsky.feed.post/3juhgsu4tpi2e" #URI of root post
+        #     },
+        #     #parent is the comment you want to reply to, if you want to reply to the main post directly this should be same as root
+        #     "parent": {
+        #         "cid": "bafyreie7eyj4upwzjdl2vmzqq4gin3qnuttpb6nzi6xybgdpesfrtcuguu",
+        #         "uri": "at://did:plc:mguf3p2ana5qzs7wu3ss4ghk/app.bsky.feed.post/3jum6axhxff22"
+        #     }
+        #}
         if not timestamp:
             timestamp = datetime.datetime.now(datetime.timezone.utc)
         timestamp = timestamp.isoformat().replace('+00:00', 'Z')
@@ -186,7 +200,8 @@ class Session():
                 "alt": "",
                 "image": image_resp.json().get('blob')
             }]
-
+        if reply_to:
+            data['record']['reply'] = reply_to
         resp = requests.post(
             self.ATP_HOST + "/xrpc/com.atproto.repo.createRecord",
             json=data,
