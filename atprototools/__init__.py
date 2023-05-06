@@ -50,7 +50,28 @@ class Session():
         else: # re-init
             # what is the endpoint
             pass
-                        
+
+    def apiget(self, url, params={}, extra_headers={}):
+        """Make a GET request using the auth token and ATP host."""
+        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
+        headers.update(extra_headers)
+        if not url.casefold().startswith('http'): # what if local host?
+            url = self.ATP_HOST + url
+        resp = requests.get(url, params=params, headers=headers)
+        # TODO ideally would add error handling here to avoid doing it elsewhere
+        # e.g. call `self.reinit` if needed
+        return resp
+    
+    def apipost(self, url, json={}, extra_headers={}):
+        """Make a POST request using the auth token and ATP host."""
+        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
+        headers.update(extra_headers)
+        if not url.casefold().startswith('http'): # what if local host?
+            url = self.ATP_HOST + url
+        resp = requests.post(url, json=json, headers=headers)
+        # TODO ideally would add error handling here to avoid doing it elsewhere
+        # e.g. call `self.reinit` if needed
+        return resp
 
     def rebloot(self, url):
         """Rebloot a bloot given the URL."""
@@ -82,8 +103,6 @@ class Session():
         timestamp = datetime.datetime.now(datetime.timezone.utc)
         timestamp = timestamp.isoformat().replace('+00:00', 'Z')
 
-        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
-
         data = {
             "collection": "app.bsky.feed.repost",
             "repo": "{}".format(self.DID),
@@ -97,29 +116,26 @@ class Session():
             }
         }
 
-        resp = requests.post(
-            self.ATP_HOST + "/xrpc/com.atproto.repo.createRecord",
-            json=data,
-            headers=headers
+        resp = self.apipost(
+            "/xrpc/com.atproto.repo.createRecord",
+            json=data
         )
 
         return resp
 
     def resolve_handle(self, username):
         """Get the DID given a username, aka getDid."""
-        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
-        resp = requests.get(
-            self.ATP_HOST + "/xrpc/com.atproto.identity.resolveHandle?handle={}".format(username),
-            headers=headers
+        resp = self.apiget(
+            "/xrpc/com.atproto.identity.resolveHandle",
+            params={"handle": username}
         )
         return resp
     
     def get_skyline(self,n = 10):
         """Fetch the logged in account's following timeline ("skyline")."""
-        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
-        resp = requests.get(
-            self.ATP_HOST + "/xrpc/app.bsky.feed.getTimeline?limit={}".format(n),
-            headers=headers
+        resp = self.apiget(
+            "/xrpc/app.bsky.feed.getTimeline",
+            params={"limit": n}
         )
         return resp
     
@@ -133,8 +149,6 @@ class Session():
         # getPosts
         # https://bsky.social/xrpc/app.bsky.feed.getPosts?uris=at://did:plc:o2hywbrivbyxugiukoexum57/app.bsky.feed.post/3jua5rlgrq42p
 
-        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
-
         username_of_person_in_link = url.split('/')[-3]
         if not "did:plc" in username_of_person_in_link:
             did_of_person_in_link = self.resolve_handle(username_of_person_in_link).json().get('did')
@@ -145,22 +159,21 @@ class Session():
 
         uri = "at://{}/app.bsky.feed.post/{}".format(did_of_person_in_link, url_identifier)
 
-        resp = requests.get(
-            self.ATP_HOST + "/xrpc/app.bsky.feed.getPosts?uris={}".format(uri),
-            headers=headers
+        resp = self.apiget(
+            self.ATP_HOST + "/xrpc/app.bsky.feed.getPosts",
+            params={"uris": uri}
         )
 
         return resp
     
     def upload_blob(self, blob_path, content_type):
         """Upload bytes data (a "blob") with the given content type."""
-        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN, "Content-Type": content_type}
         with open(blob_path, 'rb') as f:
             image_bytes = f.read()
-            resp = requests.post(
-                self.ATP_HOST + "/xrpc/com.atproto.repo.uploadBlob",
+            resp = self.apipost(
+                "/xrpc/com.atproto.repo.uploadBlob",
                 data=image_bytes,
-                headers=headers
+                extra_headers={"Content-Type": content_type}
             )
         return resp
 
@@ -182,8 +195,6 @@ class Session():
         if not timestamp:
             timestamp = datetime.datetime.now(datetime.timezone.utc)
         timestamp = timestamp.isoformat().replace('+00:00', 'Z')
-
-        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
 
         data = {
             "collection": "app.bsky.feed.post",
@@ -208,10 +219,9 @@ class Session():
             }]
         if reply_to:
             data['record']['reply'] = reply_to
-        resp = requests.post(
-            self.ATP_HOST + "/xrpc/com.atproto.repo.createRecord",
-            json=data,
-            headers=headers
+        resp = self.apipost(
+            "/xrpc/com.atproto.repo.createRecord",
+            json=data
         )
 
         return resp
@@ -221,11 +231,9 @@ class Session():
         # i.e. /profile/foo.bsky.social/post/AAAA
         # rkey is AAAA
         data = {"collection":"app.bsky.feed.post","repo":"did:plc:{}".format(did),"rkey":"{}".format(rkey)}
-        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
         resp = requests.post(
-            self.ATP_HOST + "/xrpc/com.atproto.repo.deleteRecord",
-            json = data,
-            headers=headers
+            "/xrpc/com.atproto.repo.deleteRecord",
+            json = data
         )
         return resp
 
@@ -239,13 +247,10 @@ class Session():
         if did_of_car_to_fetch == None:
             did_of_car_to_fetch = self.DID
 
-        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
-
-        resp = requests.get(
-            self.ATP_HOST + "/xrpc/com.atproto.sync.getRepo?did={}".format(did_of_car_to_fetch),
-            headers = headers
+        resp = self.apiget(
+            "/xrpc/com.atproto.sync.getRepo",
+            params={"did": did_of_car_to_fetch}
         )
-
         return resp
 
     def get_latest_bloot(self, accountname):
@@ -254,12 +259,10 @@ class Session():
 
     def get_latest_n_bloots(self, username, n=5):
         """Return the most recent n bloots from the specified account."""
-        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
         resp = requests.get(
-            self.ATP_HOST + "/xrpc/app.bsky.feed.getAuthorFeed?actor={}&limit={}".format(username, n),
-            headers = headers
+            self.ATP_HOST + "/xrpc/app.bsky.feed.getAuthorFeed",
+            params={"actor": username, "limit": n},
         )
-
         return resp
 
     # [[API Design]] TODO one implementation should be highly ergonomic (comfy 2 use) and the other should just closely mirror the API's exact behavior?
@@ -280,8 +283,6 @@ class Session():
         timestamp = datetime.datetime.now(datetime.timezone.utc)
         timestamp = timestamp.isoformat().replace('+00:00', 'Z')
 
-        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
-
         data = {
             "collection": "app.bsky.graph.follow",
             "repo": "{}".format(self.DID),
@@ -292,10 +293,9 @@ class Session():
             }
         }
 
-        resp = requests.post(
-            self.ATP_HOST + "/xrpc/com.atproto.repo.createRecord",
-            json=data,
-            headers=headers
+        resp = self.apipost(
+            "/xrpc/com.atproto.repo.createRecord",
+            json=data
         )
 
         return resp
@@ -305,15 +305,12 @@ class Session():
         raise NotImplementedError
     
     def get_profile(self, username):
-        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
-
         # TODO did / username check, it should just work regardless of which it is
 
         resp = requests.get(
-            self.ATP_HOST + "/xrpc/app.bsky.actor.getProfile?actor={}".format(username),
-            headers=headers
+            "/xrpc/app.bsky.actor.getProfile",
+            params={"actor": username},
         )
-
         return resp
 
 
