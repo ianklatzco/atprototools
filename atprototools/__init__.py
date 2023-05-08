@@ -1,6 +1,7 @@
 import requests
 import datetime
 import os
+import re
 import unittest
 
 # ATP_HOST = "https://bsky.social"
@@ -23,6 +24,10 @@ class Session():
         self.ATP_AUTH_TOKEN = ""
         self.DID = ""
         self.USERNAME = username
+
+        regex = re.compile(r"[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}")
+        if bool(regex.fullmatch(password)) == False:
+            raise ValueError("Password is not in the app password format, are you sure you're using your app password? Generate one in your settings.")
 
         data = {"identifier": username, "password": password}
         resp = requests.post(
