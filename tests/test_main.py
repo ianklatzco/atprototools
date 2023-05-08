@@ -35,12 +35,12 @@ class TestSessionLogin(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         pass
 
-    def test_getProfile(self):
+    def test_get_profile(self):
         # TODO figure out this test library's persistent object and re-use the same session for all the tests
         # TODOTODO refresh the token since lifetime is probably a minute
         pass
 
-    def test_uploadBlob(self):
+    def test_upload_blob(self):
         session = Session(BSKY_USERNAME, BSKY_PASSWORD)
         self.assertIsNotNone(session.DID)
         resp = session.uploadBlob("tests/test.jpeg", "image/jpeg")
@@ -50,14 +50,14 @@ class TestSessionLogin(unittest.TestCase):
     def test_post_bloot(self):
         session = Session(BSKY_USERNAME, BSKY_PASSWORD)
         self.assertIsNotNone(session.DID)
-        resp = session.post_bloot("good meme", "tests/test.jpeg")
+        resp = session.postBloot("good meme", "tests/test.jpeg")
         self.assertEqual(resp.status_code, 200)
         # print(resp.json())
         pass
 
     def test_get_skyline(self):
         session = Session(BSKY_USERNAME, BSKY_PASSWORD)
-        skyline_firstitem_text = session.get_skyline(1).json().get('feed')[0].get('post').get('record').get('text')
+        skyline_firstitem_text = session.getSkyline(1).json().get('feed')[0].get('post').get('record').get('text')
         self.assertIsNotNone(skyline_firstitem_text)
     
     def test_get_bloot_by_url(self):
@@ -66,9 +66,9 @@ class TestSessionLogin(unittest.TestCase):
         url1 = "https://staging.bsky.app/profile/did:plc:o2hywbrivbyxugiukoexum57/post/3jua5rlgrq42p" # did
         url2 = "https://staging.bsky.app/profile/klatz.co/post/3jua5rlgrq42p" # username
 
-        ee = session.get_bloot_by_url(url1).json()
+        ee = session.getBlootByUrl(url1).json()
         assert ee.get('posts') != None
-        bb = session.get_bloot_by_url(url2).json()
+        bb = session.getBlootByUrl(url2).json()
         assert bb.get('posts') != None
 
     def test_reply(self):
@@ -79,5 +79,5 @@ class TestSessionLogin(unittest.TestCase):
             'uri': 'at://did:plc:o2hywbrivbyxugiukoexum57/app.bsky.feed.post/3jua5rlgrq42p'
         }
         reply_ref = {"root": first_post, "parent": first_post}
-        resp = session.post_bloot("reply test", reply_to=reply_ref)
+        resp = session.postBloot("reply test", reply_to=reply_ref)
         self.assertEqual(resp.status_code, 200)
