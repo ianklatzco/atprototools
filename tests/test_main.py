@@ -35,15 +35,15 @@ class TestSessionLogin(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         pass
 
-    def test_getProfile(self):
+    def test_get_profile(self):
         # TODO figure out this test library's persistent object and re-use the same session for all the tests
         # TODOTODO refresh the token since lifetime is probably a minute
         pass
 
-    def test_uploadBlob(self):
+    def test_upload_blob(self):
         session = Session(BSKY_USERNAME, BSKY_PASSWORD)
         self.assertIsNotNone(session.DID)
-        resp = session.uploadBlob("tests/test.jpeg", "image/jpeg")
+        resp = session.upload_blob("tests/test.jpeg", "image/jpeg")
         self.assertEqual(resp.status_code, 200)
         pass
 
