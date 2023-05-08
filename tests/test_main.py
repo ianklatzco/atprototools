@@ -73,9 +73,10 @@ class TestSessionLogin(unittest.TestCase):
 
     def test_reply(self):
         session = Session(BSKY_USERNAME, BSKY_PASSWORD)
+        # https://staging.bsky.app/profile/klatz.co/post/3jua5rlgrq42p
         first_post = {
-        'cid': 'bafyreigyk6l24uiorkxhqyrridwru2bwdqcpnitclj267xh74qqxzhjfhu',
-        'uri': 'at://did:plc:o2hywbrivbyxugiukoexum57/app.bsky.feed.post/3jua5rlgrq42p'
+            'cid': 'bafyreigyk6l24uiorkxhqyrridwru2bwdqcpnitclj267xh74qqxzhjfhu',
+            'uri': 'at://did:plc:o2hywbrivbyxugiukoexum57/app.bsky.feed.post/3jua5rlgrq42p'
         }
         reply_ref = {"root": first_post, "parent": first_post}
         resp = session.post_bloot("reply test", reply_to=reply_ref)
