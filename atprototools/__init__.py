@@ -60,7 +60,7 @@ class Session():
         resp = requests.get(url, params=params, headers=headers)
         # TODO ideally would add error handling here to avoid doing it elsewhere
         # e.g. call `self.reinit` if needed
-        # should probably be a way of re-uniting this with authedPost
+        # should probably be a way of uniting this with authedPost
         return resp
     
     def authedPost(self, url, json={}, extra_headers={}):
@@ -117,7 +117,7 @@ class Session():
             }
         }
 
-        resp = self.apipost(
+        resp = self.authedPost(
             "/xrpc/com.atproto.repo.createRecord",
             json=data
         )
@@ -126,7 +126,7 @@ class Session():
 
     def resolve_handle(self, username):
         """Get the DID given a username, aka getDid."""
-        resp = self.apiget(
+        resp = self.authedGet(
             "/xrpc/com.atproto.identity.resolveHandle",
             params={"handle": username}
         )
@@ -134,7 +134,7 @@ class Session():
     
     def get_skyline(self,n = 10):
         """Fetch the logged in account's following timeline ("skyline")."""
-        resp = self.apiget(
+        resp = self.authedGet(
             "/xrpc/app.bsky.feed.getTimeline",
             params={"limit": n}
         )
@@ -160,7 +160,7 @@ class Session():
 
         uri = "at://{}/app.bsky.feed.post/{}".format(did_of_person_in_link, url_identifier)
 
-        resp = self.apiget(
+        resp = self.authedGet(
             self.ATP_HOST + "/xrpc/app.bsky.feed.getPosts",
             params={"uris": uri}
         )
@@ -171,7 +171,7 @@ class Session():
         """Upload bytes data (a "blob") with the given content type."""
         with open(blob_path, 'rb') as f:
             image_bytes = f.read()
-            resp = self.apipost(
+            resp = self.authedPost(
                 "/xrpc/com.atproto.repo.uploadBlob",
                 data=image_bytes,
                 extra_headers={"Content-Type": content_type}
@@ -220,7 +220,7 @@ class Session():
             }]
         if reply_to:
             data['record']['reply'] = reply_to
-        resp = self.apipost(
+        resp = self.authedPost(
             "/xrpc/com.atproto.repo.createRecord",
             json=data
         )
@@ -232,7 +232,7 @@ class Session():
         # i.e. /profile/foo.bsky.social/post/AAAA
         # rkey is AAAA
         data = {"collection":"app.bsky.feed.post","repo":"did:plc:{}".format(did),"rkey":"{}".format(rkey)}
-        resp = requests.post(
+        resp = self.authedPost(
             "/xrpc/com.atproto.repo.deleteRecord",
             json = data
         )
@@ -248,7 +248,7 @@ class Session():
         if did_of_car_to_fetch == None:
             did_of_car_to_fetch = self.DID
 
-        resp = self.apiget(
+        resp = self.authedGet(
             "/xrpc/com.atproto.sync.getRepo",
             params={"did": did_of_car_to_fetch}
         )
@@ -260,8 +260,8 @@ class Session():
 
     def get_latest_n_bloots(self, username, n=5):
         """Return the most recent n bloots from the specified account."""
-        resp = requests.get(
-            self.ATP_HOST + "/xrpc/app.bsky.feed.getAuthorFeed",
+        resp = self.authedGet(
+            "/xrpc/app.bsky.feed.getAuthorFeed",
             params={"actor": username, "limit": n},
         )
         return resp
@@ -294,7 +294,7 @@ class Session():
             }
         }
 
-        resp = self.apipost(
+        resp = self.authedPost(
             "/xrpc/com.atproto.repo.createRecord",
             json=data
         )
@@ -308,7 +308,7 @@ class Session():
     def get_profile(self, username):
         # TODO did / username check, it should just work regardless of which it is
 
-        resp = requests.get(
+        resp = self.authedGet(
             "/xrpc/app.bsky.actor.getProfile",
             params={"actor": username},
         )
