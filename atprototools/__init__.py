@@ -72,11 +72,11 @@ class Session():
         }
         '''
 
-        person_youre_reblooting = self.resolve_handle(url.split('/')[-3]).json().get('did') # its a DID
+        person_youre_reblooting = self.resolveHandle(url.split('/')[-3]).json().get('did') # its a DID
         url_identifier = url.split('/')[-1]
 
         # import pdb; pdb.set_trace()
-        bloot_cid = self.get_bloot_by_url(url).json().get('thread').get('post').get('cid')
+        bloot_cid = self.getBlootByUrl(url).json().get('thread').get('post').get('cid')
 
         # subject -> uri is the maia one (thing rt'ing, scx)
         timestamp = datetime.datetime.now(datetime.timezone.utc)
@@ -105,7 +105,7 @@ class Session():
 
         return resp
 
-    def resolve_handle(self, username):
+    def resolveHandle(self, username):
         """Get the DID given a username, aka getDid."""
         headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
         resp = requests.get(
@@ -114,7 +114,7 @@ class Session():
         )
         return resp
     
-    def get_skyline(self,n = 10):
+    def getSkyline(self,n = 10):
         """Fetch the logged in account's following timeline ("skyline")."""
         headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
         resp = requests.get(
@@ -123,7 +123,7 @@ class Session():
         )
         return resp
     
-    def get_bloot_by_url(self, url):
+    def getBlootByUrl(self, url):
         """Get a bloot's HTTP response data when given the URL."""
         # https://staging.bsky.app/profile/shinyakato.dev/post/3ju777mfnfv2j
         "https://bsky.social/xrpc/app.bsky.feed.getPostThread?uri=at%3A%2F%2Fdid%3Aplc%3Ascx5mrfxxrqlfzkjcpbt3xfr%2Fapp.bsky.feed.post%2F3jszsrnruws27A"
@@ -137,7 +137,7 @@ class Session():
 
         username_of_person_in_link = url.split('/')[-3]
         if not "did:plc" in username_of_person_in_link:
-            did_of_person_in_link = self.resolve_handle(username_of_person_in_link).json().get('did')
+            did_of_person_in_link = self.resolveHandle(username_of_person_in_link).json().get('did')
         else:
             did_of_person_in_link = username_of_person_in_link
 
@@ -152,7 +152,7 @@ class Session():
 
         return resp
     
-    def upload_blob(self, blob_path, content_type):
+    def uploadBlob(self, blob_path, content_type):
         """Upload bytes data (a "blob") with the given content type."""
         headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN, "Content-Type": content_type}
         with open(blob_path, 'rb') as f:
@@ -164,7 +164,7 @@ class Session():
             )
         return resp
 
-    def post_bloot(self, postcontent, image_path = None, timestamp=None, reply_to=None):
+    def postBloot(self, postcontent, image_path = None, timestamp=None, reply_to=None):
         """Post a bloot."""
         #reply_to expects a dict like the following
         # {
@@ -198,9 +198,9 @@ class Session():
 
         if image_path:
             data['record']['embed'] = {}
-            image_resp = self.upload_blob(image_path, "image/jpeg")
+            image_resp = self.uploadBlob(image_path, "image/jpeg")
             x = image_resp.json().get('blob')
-            image_resp = self.upload_blob(image_path, "image/jpeg")
+            image_resp = self.uploadBlob(image_path, "image/jpeg")
             data["record"]["embed"]["$type"] = "app.bsky.embed.images"
             data['record']["embed"]['images'] = [{
                 "alt": "",
@@ -216,7 +216,7 @@ class Session():
 
         return resp
 
-    def delete_bloot(self, did,rkey):
+    def deleteBloot(self, did,rkey):
         # rkey: post slug
         # i.e. /profile/foo.bsky.social/post/AAAA
         # rkey is AAAA
@@ -229,7 +229,7 @@ class Session():
         )
         return resp
 
-    def get_car_file(self, did_of_car_to_fetch=None):
+    def getArchive(self, did_of_car_to_fetch=None):
         """Get a .car file containing all bloots.
         
         TODO is there a putRepo?
@@ -248,11 +248,11 @@ class Session():
 
         return resp
 
-    def get_latest_bloot(self, accountname):
+    def getLatestBloot(self, accountname):
         """Return the most recent bloot from the specified account."""
-        return self.get_latest_n_bloots(accountname, 1)
+        return self.getLatestNBloots(accountname, 1)
 
-    def get_latest_n_bloots(self, username, n=5):
+    def getLatestNBloots(self, username, n=5):
         """Return the most recent n bloots from the specified account."""
         headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
         resp = requests.get(
@@ -271,7 +271,7 @@ class Session():
         """Follow the user with the given username or DID."""
 
         if username:
-            did_of_person_you_wanna_follow = self.resolve_handle(username).json().get("did")
+            did_of_person_you_wanna_follow = self.resolveHandle(username).json().get("did")
 
         if not did_of_person_you_wanna_follow:
             # TODO better error in resolveHandle
@@ -338,10 +338,10 @@ if __name__ == "__main__":
     # This code will only be executed if the script is run directly
     # login(os.environ.get("BSKY_USERNAME"), os.environ.get("BSKY_PASSWORD"))
     sess = Session(os.environ.get("BSKY_USERNAME"), os.environ.get("BSKY_PASSWORD"))
-    # f = get_latest_n_bloots('klatz.co',1).content
+    # f = getLatestNBloots('klatz.co',1).content
     # print(f)
     # resp = rebloot("https://staging.bsky.app/profile/klatz.co/post/3jt22a3jx5l2a")
-    # resp = get_car_file()
+    # resp = getArchive()
     import pdb; pdb.set_trace()
 
 
