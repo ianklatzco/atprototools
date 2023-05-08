@@ -3,6 +3,9 @@
 Easy-to-use and ergonomic library for interacting with bluesky, <br>
 packaged so you can `pip install atprototools` and go.
 
+this library should serve as a gentle guide of mostly natural-language python
+to get as many people writing bsky code as possible. 
+
 ## ONE-LINER TO GET STARTED *INSTANTLY* (ノ ゜Д゜)ノ ︵:
 ```
 pip install atprototools && export BSKY_USERNAME="yourname.bsky.social" && export BSKY_PASSWORD="yourpassword" &&  python -i -c "import atprototools, os; atp = atprototools.Session(os.environ.get('BSKY_USERNAME'), os.environ.get('BSKY_PASSWORD')); atp.postBloot('hello world from atprototools!')"
