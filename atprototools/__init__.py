@@ -51,7 +51,7 @@ class Session():
             # what is the endpoint
             pass
 
-    def apiget(self, url, params={}, extra_headers={}):
+    def authedGet(self, url, params={}, extra_headers={}):
         """Make a GET request using the auth token and ATP host."""
         headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
         headers.update(extra_headers)
@@ -60,9 +60,10 @@ class Session():
         resp = requests.get(url, params=params, headers=headers)
         # TODO ideally would add error handling here to avoid doing it elsewhere
         # e.g. call `self.reinit` if needed
+        # should probably be a way of re-uniting this with authedPost
         return resp
     
-    def apipost(self, url, json={}, extra_headers={}):
+    def authedPost(self, url, json={}, extra_headers={}):
         """Make a POST request using the auth token and ATP host."""
         headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
         headers.update(extra_headers)
