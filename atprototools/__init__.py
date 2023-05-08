@@ -38,18 +38,17 @@ class Session():
         # TODO DIDs expire shortly and need to be refreshed for any long-lived sessions
 
     def reinit(self):
-        """Check if the session needs to be refreshed, and refresh if so."""
-        # TODO
-        # if a request failed, use refreshJWT
-        resp = self.get_profile("klatz.co")
+        """Refresh the session."""
+        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
 
-        if resp.status_code == 200:
-            # yay!
-            # do nothing lol
-            pass
-        else: # re-init
-            # what is the endpoint
-            pass
+        resp = requests.post(
+            self.ATP_HOST + "/xrpc/com.atproto.server.refreshSession",
+            headers=headers
+        )
+
+        self.ATP_AUTH_TOKEN = resp.json().get('accessJwt')
+        if self.ATP_AUTH_TOKEN == None:
+            raise ValueError("No access token, was the account deleted?")
                         
 
     def rebloot(self, url):
@@ -103,7 +102,11 @@ class Session():
             headers=headers
         )
 
-        return resp
+        if resp.status_code == 200:
+            return resp
+        else:
+            self.reinit()
+            self.rebloot(url)
 
     def resolveHandle(self, username):
         """Get the DID given a username, aka getDid."""
@@ -112,7 +115,11 @@ class Session():
             self.ATP_HOST + "/xrpc/com.atproto.identity.resolveHandle?handle={}".format(username),
             headers=headers
         )
-        return resp
+        if resp.status_code == 200:
+            return resp
+        else:
+            self.reinit()
+            self.resolveHandle(username)
     
     def getSkyline(self,n = 10):
         """Fetch the logged in account's following timeline ("skyline")."""
@@ -121,7 +128,11 @@ class Session():
             self.ATP_HOST + "/xrpc/app.bsky.feed.getTimeline?limit={}".format(n),
             headers=headers
         )
-        return resp
+        if resp.status_code == 200:
+            return resp
+        else:
+            self.reinit()
+            self.getSkyline(n)
     
     def getBlootByUrl(self, url):
         """Get a bloot's HTTP response data when given the URL."""
@@ -150,7 +161,11 @@ class Session():
             headers=headers
         )
 
-        return resp
+        if resp.status_code == 200:
+            return resp
+        else:
+            self.reinit()
+            self.getBlootByUrl(url)
     
     def uploadBlob(self, blob_path, content_type):
         """Upload bytes data (a "blob") with the given content type."""
@@ -162,7 +177,11 @@ class Session():
                 data=image_bytes,
                 headers=headers
             )
-        return resp
+        if resp.status_code == 200:
+            return resp
+        else:
+            self.reinit()
+            self.uploadBlob(blob_path, content_type)
 
     def postBloot(self, postcontent, image_path = None, timestamp=None, reply_to=None):
         """Post a bloot."""
@@ -214,7 +233,11 @@ class Session():
             headers=headers
         )
 
-        return resp
+        if resp.status_code == 200:
+            return resp
+        else:
+            self.reinit()
+            self.postBloot(post_content, timestamp, image_path, reply_to)
 
     def deleteBloot(self, did,rkey):
         # rkey: post slug
@@ -228,6 +251,11 @@ class Session():
             headers=headers
         )
         return resp
+        if resp.status_code == 200:
+            return resp
+        else:
+            self.reinit()
+            self.deleteBloot(did, rkey)
 
     def getArchive(self, did_of_car_to_fetch=None):
         """Get a .car file containing all bloots.
@@ -246,7 +274,11 @@ class Session():
             headers = headers
         )
 
-        return resp
+        if resp.status_code == 200:
+            return resp
+        else:
+            self.reinit()
+            self.getArchive(did_of_car_to_fetch)
 
     def getLatestBloot(self, accountname):
         """Return the most recent bloot from the specified account."""
@@ -260,7 +292,11 @@ class Session():
             headers = headers
         )
 
-        return resp
+        if resp.status_code == 200:
+            return resp
+        else:
+            self.reinit()
+            self.getLatestNBloot(account)
 
     # [[API Design]] TODO one implementation should be highly ergonomic (comfy 2 use) and the other should just closely mirror the API's exact behavior?
     # idk if im super happy about returning requests, either, i kinda want tuples where the primary object u get back is whatever ergonomic thing you expect
@@ -298,7 +334,11 @@ class Session():
             headers=headers
         )
 
-        return resp
+        if resp.status_code == 200:
+            return resp
+        else:
+            self.reinit()
+            self.follow(username, did_of_person_you_wanna_follow)
     
     def unfollow(self):
         # TODO lots of code re-use. package everything into a API_ACTION class.
@@ -314,7 +354,11 @@ class Session():
             headers=headers
         )
 
-        return resp
+        if resp.status_code == 200:
+            return resp
+        else:
+            self.reinit()
+            self.get_profile(username)
 
 
 def register(user, password, invcode, email):
