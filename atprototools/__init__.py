@@ -38,18 +38,17 @@ class Session():
         # TODO DIDs expire shortly and need to be refreshed for any long-lived sessions
 
     def reinit(self):
-        """Check if the session needs to be refreshed, and refresh if so."""
-        # TODO
-        # if a request failed, use refreshJWT
-        resp = self.get_profile("klatz.co")
+        """Refresh the session."""
+        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
 
-        if resp.status_code == 200:
-            # yay!
-            # do nothing lol
-            pass
-        else: # re-init
-            # what is the endpoint
-            pass
+        resp = requests.post(
+            self.ATP_HOST + "/xrpc/com.atproto.server.refreshSession",
+            headers=headers
+        )
+
+        self.ATP_AUTH_TOKEN = resp.json().get('accessJwt')
+        if self.ATP_AUTH_TOKEN == None:
+            raise ValueError("No access token, was the account deleted?")
                         
 
     def rebloot(self, url):
