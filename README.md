@@ -3,8 +3,8 @@
 Easy-to-use and ergonomic library for interacting with bluesky, <br>
 packaged so you can `pip install atprototools` and go.
 
-this library should serve as a gentle guide of mostly natural-language python
-to get as many people writing bsky code as possible. 
+this library should serve as a gentle guide of mostly natural-language <br>
+python to get as many people writing bsky code as possible. 
 
 ## ONE-LINER TO GET STARTED *INSTANTLY* (ノ ゜Д゜)ノ ︵:
 ```
