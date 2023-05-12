@@ -229,11 +229,12 @@ class Session():
         )
         return resp
 
-    def getArchive(self, did_of_car_to_fetch=None):
+    def getArchive(self, did_of_car_to_fetch=None, save_to_disk_path=None):
         """Get a .car file containing all bloots.
         
         TODO is there a putRepo?
         TODO save to file
+        TODO specify user
         """
 
         if did_of_car_to_fetch == None:
@@ -245,6 +246,9 @@ class Session():
             self.ATP_HOST + "/xrpc/com.atproto.sync.getRepo?did={}".format(did_of_car_to_fetch),
             headers = headers
         )
+
+        if save_to_disk_path:
+            pass
 
         return resp
 
