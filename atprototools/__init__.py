@@ -2,6 +2,8 @@ import requests
 import datetime
 import os
 import unittest
+import re
+import warnings
 
 # ATP_HOST = "https://bsky.social"
 # ATP_AUTH_TOKEN = ""
@@ -15,9 +17,11 @@ import unittest
 
 
 class Session():
-    def __init__(self, username, password, pds = None):
-        if pds: # check if pds is not empty
-            self.ATP_HOST = pds # use the given value
+    def __init__(self, username, password, pds=None):
+        self.validate_password(password)
+
+        if pds:  # check if pds is not empty
+            self.ATP_HOST = pds  # use the given value
         else:
             self.ATP_HOST = "https://bsky.social" # use bsky.social by default
         self.ATP_AUTH_TOKEN = ""
@@ -36,6 +40,13 @@ class Session():
 
         self.DID = resp.json().get("did")
         # TODO DIDs expire shortly and need to be refreshed for any long-lived sessions
+
+    def validate_password(self, password):
+        pattern = re.compile(
+            "^[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}$")
+        if not pattern.match(password):
+            warnings.warn(
+                "Invalid App password. Please ensure your password follows the format: xxxx-xxxx-xxxx-xxxx where x is a lowercase letter or digit.")
 
     def reinit(self):
         """Check if the session needs to be refreshed, and refresh if so."""
