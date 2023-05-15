@@ -251,18 +251,20 @@ class Session():
 
         TODO is there a putRepo?
         TODO save to file
+        TODO specify user
         """
 
         if did_of_car_to_fetch == None:
             did_of_car_to_fetch = self.DID
 
-        if save_to_disk_path:
-            pass
-
         resp = self.authedGet(
             "/xrpc/com.atproto.sync.getRepo",
             params={"did": did_of_car_to_fetch}
         )
+        
+        if save_to_disk_path:
+            pass
+    
         return resp
 
     def getLatestBloot(self, accountname):
