@@ -27,7 +27,7 @@ class Session():
 
         regex = re.compile(r"[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}")
         if bool(regex.fullmatch(password)) == False:
-            raise ValueError("Password is not in the app password format, are you sure you're using your app password? Generate one in your settings.")
+            raise ValueError("Password is not in the app password format, are you sure you're using your app password? Generate one at https://staging.bsky.app/settings/app-passwords.")
 
         data = {"identifier": username, "password": password}
         resp = requests.post(
