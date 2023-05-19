@@ -23,6 +23,7 @@ class Session():
         self.ATP_AUTH_TOKEN = ""
         self.DID = ""
         self.USERNAME = username
+        self.HEADERS = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
 
         data = {"identifier": username, "password": password}
         resp = requests.post(
@@ -82,8 +83,6 @@ class Session():
         timestamp = datetime.datetime.now(datetime.timezone.utc)
         timestamp = timestamp.isoformat().replace('+00:00', 'Z')
 
-        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
-
         data = {
             "collection": "app.bsky.feed.repost",
             "repo": "{}".format(self.DID),
@@ -100,26 +99,24 @@ class Session():
         resp = requests.post(
             self.ATP_HOST + "/xrpc/com.atproto.repo.createRecord",
             json=data,
-            headers=headers
+            headers=self.HEADERS
         )
 
         return resp
 
     def resolveHandle(self, username):
         """Get the DID given a username, aka getDid."""
-        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
         resp = requests.get(
             self.ATP_HOST + "/xrpc/com.atproto.identity.resolveHandle?handle={}".format(username),
-            headers=headers
+            headers=self.HEADERS
         )
         return resp
     
     def getSkyline(self,n = 10):
         """Fetch the logged in account's following timeline ("skyline")."""
-        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
         resp = requests.get(
             self.ATP_HOST + "/xrpc/app.bsky.feed.getTimeline?limit={}".format(n),
-            headers=headers
+            headers=self.HEADERS
         )
         return resp
     
@@ -133,8 +130,6 @@ class Session():
         # getPosts
         # https://bsky.social/xrpc/app.bsky.feed.getPosts?uris=at://did:plc:o2hywbrivbyxugiukoexum57/app.bsky.feed.post/3jua5rlgrq42p
 
-        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
-
         username_of_person_in_link = url.split('/')[-3]
         if not "did:plc" in username_of_person_in_link:
             did_of_person_in_link = self.resolveHandle(username_of_person_in_link).json().get('did')
@@ -147,7 +142,7 @@ class Session():
 
         resp = requests.get(
             self.ATP_HOST + "/xrpc/app.bsky.feed.getPosts?uris={}".format(uri),
-            headers=headers
+            headers=self.HEADERS
         )
 
         return resp
@@ -183,7 +178,6 @@ class Session():
             timestamp = datetime.datetime.now(datetime.timezone.utc)
         timestamp = timestamp.isoformat().replace('+00:00', 'Z')
 
-        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
 
         data = {
             "collection": "app.bsky.feed.post",
@@ -211,7 +205,7 @@ class Session():
         resp = requests.post(
             self.ATP_HOST + "/xrpc/com.atproto.repo.createRecord",
             json=data,
-            headers=headers
+            headers=self.HEADERS
         )
 
         return resp
@@ -221,11 +215,10 @@ class Session():
         # i.e. /profile/foo.bsky.social/post/AAAA
         # rkey is AAAA
         data = {"collection":"app.bsky.feed.post","repo":"did:plc:{}".format(did),"rkey":"{}".format(rkey)}
-        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
         resp = requests.post(
             self.ATP_HOST + "/xrpc/com.atproto.repo.deleteRecord",
             json = data,
-            headers=headers
+            headers=self.HEADERS
         )
         return resp
 
@@ -240,11 +233,9 @@ class Session():
         if did_of_car_to_fetch == None:
             did_of_car_to_fetch = self.DID
 
-        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
-
         resp = requests.get(
             self.ATP_HOST + "/xrpc/com.atproto.sync.getRepo?did={}".format(did_of_car_to_fetch),
-            headers = headers
+            headers = self.headers
         )
 
         if save_to_disk_path:
@@ -258,10 +249,9 @@ class Session():
 
     def getLatestNBloots(self, username, n=5):
         """Return the most recent n bloots from the specified account."""
-        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
         resp = requests.get(
             self.ATP_HOST + "/xrpc/app.bsky.feed.getAuthorFeed?actor={}&limit={}".format(username, n),
-            headers = headers
+            headers = self.HEADERS
         )
 
         return resp
@@ -284,8 +274,6 @@ class Session():
         timestamp = datetime.datetime.now(datetime.timezone.utc)
         timestamp = timestamp.isoformat().replace('+00:00', 'Z')
 
-        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
-
         data = {
             "collection": "app.bsky.graph.follow",
             "repo": "{}".format(self.DID),
@@ -299,7 +287,7 @@ class Session():
         resp = requests.post(
             self.ATP_HOST + "/xrpc/com.atproto.repo.createRecord",
             json=data,
-            headers=headers
+            headers=self.HEADERS
         )
 
         return resp
@@ -309,13 +297,11 @@ class Session():
         raise NotImplementedError
     
     def get_profile(self, username):
-        headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
-
         # TODO did / username check, it should just work regardless of which it is
 
         resp = requests.get(
             self.ATP_HOST + "/xrpc/app.bsky.actor.getProfile?actor={}".format(username),
-            headers=headers
+            headers=self.HEADERS
         )
 
         return resp
