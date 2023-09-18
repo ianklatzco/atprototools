@@ -2,6 +2,8 @@ import requests
 import datetime
 import os
 import unittest
+import mimetypes
+import json
 
 # ATP_HOST = "https://bsky.social"
 # ATP_AUTH_TOKEN = ""
@@ -32,7 +34,13 @@ class Session():
 
         self.ATP_AUTH_TOKEN = resp.json().get('accessJwt')
         if self.ATP_AUTH_TOKEN == None:
-            raise ValueError("No access token, is your password wrong? Do      export BSKY_PASSWORD='yourpassword'")
+            rc = json.loads(resp.content)
+            if rc["error"] == "RateLimitExceeded":
+                raise ValueError("Rate limit exceeded: "+str(resp.headers))
+
+            raise ValueError("No access token because"+rc["message"]+", is your password wrong? Do     export BSKY_PASSWORD='yourpassword'")
+
+        self.RateLimitRemaining = resp.headers['RateLimit-Remaining']
 
         self.DID = resp.json().get("did")
         # TODO DIDs expire shortly and need to be refreshed for any long-lived sessions
@@ -50,7 +58,7 @@ class Session():
         else: # re-init
             # what is the endpoint
             pass
-                        
+
 
     def rebloot(self, url):
         """Rebloot a bloot given the URL."""
@@ -113,7 +121,7 @@ class Session():
             headers=headers
         )
         return resp
-    
+
     def getSkyline(self,n = 10):
         """Fetch the logged in account's following timeline ("skyline")."""
         headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
@@ -122,7 +130,7 @@ class Session():
             headers=headers
         )
         return resp
-    
+
     def getBlootByUrl(self, url):
         """Get a bloot's HTTP response data when given the URL."""
         # https://staging.bsky.app/profile/shinyakato.dev/post/3ju777mfnfv2j
@@ -151,9 +159,10 @@ class Session():
         )
 
         return resp
-    
-    def uploadBlob(self, blob_path, content_type):
+
+    def uploadBlob(self, blob_path, content_type=None):
         """Upload bytes data (a "blob") with the given content type."""
+        if content_type is None: content_type = mimetypes.guess_type(blob_path)[0]
         headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN, "Content-Type": content_type}
         with open(blob_path, 'rb') as f:
             image_bytes = f.read()
@@ -197,17 +206,24 @@ class Session():
         }
 
         if image_path:
+            if isinstance(image_path,str): image_path = [ image_path ]
             data['record']['embed'] = {}
-            image_resp = self.uploadBlob(image_path, "image/jpeg")
-            x = image_resp.json().get('blob')
-            image_resp = self.uploadBlob(image_path, "image/jpeg")
             data["record"]["embed"]["$type"] = "app.bsky.embed.images"
-            data['record']["embed"]['images'] = [{
-                "alt": "",
-                "image": image_resp.json().get('blob')
-            }]
+            data['record']["embed"]['images'] = []
+
+            for ip in image_path:
+                image_resp = self.uploadBlob(ip)
+                blob = image_resp.json().get('blob')
+                data['record']["embed"]['images'].append({
+                    "alt": "",
+                    "image": blob
+                })
+
         if reply_to:
             data['record']['reply'] = reply_to
+
+
+        #print(data)
         resp = requests.post(
             self.ATP_HOST + "/xrpc/com.atproto.repo.createRecord",
             json=data,
@@ -231,7 +247,7 @@ class Session():
 
     def getArchive(self, did_of_car_to_fetch=None, save_to_disk_path=None):
         """Get a .car file containing all bloots.
-        
+
         TODO is there a putRepo?
         TODO save to file
         TODO specify user
@@ -303,11 +319,11 @@ class Session():
         )
 
         return resp
-    
+
     def unfollow(self):
         # TODO lots of code re-use. package everything into a API_ACTION class.
         raise NotImplementedError
-    
+
     def get_profile(self, username):
         headers = {"Authorization": "Bearer " + self.ATP_AUTH_TOKEN}
 
@@ -336,7 +352,7 @@ def register(user, password, invcode, email):
     )
 
     return resp
-        
+
 
 if __name__ == "__main__":
     # This code will only be executed if the script is run directly
@@ -346,6 +362,8 @@ if __name__ == "__main__":
     # print(f)
     # resp = rebloot("https://staging.bsky.app/profile/klatz.co/post/3jt22a3jx5l2a")
     # resp = getArchive()
+
+
     import pdb; pdb.set_trace()
 
 
