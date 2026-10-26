@@ -6,13 +6,13 @@ packaged so you can `pip install atprototools` and go.
 this library should serve as a gentle guide of mostly natural-language <br>
 python to get as many people writing bsky code as possible. 
 
-## ONE-LINER TO GET STARTED *INSTANTLY* (ノ ゜Д゜)ノ ︵:
+## One-liner to get started
 ```
 pip install atprototools && export BSKY_USERNAME="yourname.bsky.social" && export BSKY_PASSWORD="yourpassword" &&  python -i -c "import atprototools, os; atp = atprototools.Session(os.environ.get('BSKY_USERNAME'), os.environ.get('BSKY_PASSWORD')); atp.postBloot('hello world from atprototools!')"
 # now use atp.whatever_you_need
 ```
 
-## TWO-LINER TO GET STARTED YOUR SECOND TIME
+## Two-linker for subsequent use
 ```
 export BSKY_USERNAME="yourname.bsky.social" && export BSKY_PASSWORD="yourpassword"
 python -i -c "import atprototools, os; atp = atprototools.Session(os.environ.get('BSKY_USERNAME'), os.environ.get('BSKY_PASSWORD'))"
